@@ -14,8 +14,6 @@
 @property (strong, nonatomic) NSString *imageKey;
 @property (strong, nonatomic) NSString *itemDescription;
 @property (assign, nonatomic) BOOL hasImage;
-@property (strong, nonatomic) NSAttributedString *attrDescription;
-@property (strong, nonatomic) NSMutableArray *rangesForStrike;
 
 - (id)initWithTitle:(NSString *)title withImageKey:(NSString *)key withDescription:(NSString *)description;
 
