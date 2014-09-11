@@ -49,15 +49,11 @@ body
 }
 .screenshot .appstore
 {
-	padding: 3% 0;
+	padding: 10% 0;
 }
 .screenshot .device
 {
 	padding-bottom: 10%;
-}
-
-.githubCode {
-	padding-top: 0%;
 }
 
 /*************

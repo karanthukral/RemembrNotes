@@ -37,6 +37,10 @@ CGFloat animatedDistance;
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
+    UIMenuItem *strikethrough = [[UIMenuItem alloc]initWithTitle:@"Strike" action:@selector(strikeTheSelection:)];
+
+    [[UIMenuController sharedMenuController] setMenuItems:[NSArray arrayWithObjects:strikethrough, nil]];
+    
     self.editImageView.contentMode = UIViewContentModeScaleAspectFit;
     self.editImageView.clipsToBounds = YES;
     self.navigationItem.title = self.itemToEdit.itemTitle;
@@ -46,7 +50,7 @@ CGFloat animatedDistance;
     self.editTitleTextField.backgroundColor = [UIColor colorWithRed:0.38f green:0.37f blue:0.38f alpha:0.8f];
     self.editTitleTextField.textColor = [UIColor colorWithRed:0.97f green:0.97f blue:0.97f alpha:1.00f];
     self.editTitleTextField.autocapitalizationType = UITextAutocapitalizationTypeWords;
-    [self.editTextView setText:self.itemToEdit.itemDescription];
+    [self.editTextView setAttributedText:self.itemToEdit.attrDescription];
     
     if (self.editTextView.text.length == 0) {
         self.editTextView.textColor = [UIColor lightGrayColor];
@@ -120,7 +124,8 @@ CGFloat animatedDistance;
     if ([self.editTextView.text isEqualToString:@"Description"]) {
         self.itemToEdit.itemDescription = @"";
     } else {
-        self.itemToEdit.itemDescription = self.editTextView.text;
+        self.itemToEdit.itemDescription = self.editTextView.attributedText.string;
+        self.itemToEdit.attrDescription = self.editTextView.attributedText;
     }
     
     if (self.didDeleteImage){
@@ -146,7 +151,6 @@ CGFloat animatedDistance;
 }
 
 - (IBAction)cancelPressed:(id)sender{
-    //[self.navigationController popViewControllerAnimated:YES];
     if(!self.itemToEdit.hasImage && self.itemToEdit.imageKey){
         [[ImageStore imageStore]deleteImageForKey:self.itemToEdit.imageKey];
         self.itemToEdit.imageKey = nil;
@@ -389,6 +393,51 @@ CGFloat animatedDistance;
     }
     
     self.editImageView.backgroundColor = [UIColor colorWithRed:0.92f green:0.92f blue:0.92f alpha:1.00f];
+}
+
+- (void)strikeTheSelection:(id)sender {
+    
+    for (int i = 0; i<self.itemToEdit.rangesForStrike.count; i++) {
+        NSRange range = [[self.itemToEdit.rangesForStrike objectAtIndex:i] rangeValue];
+        if (NSEqualRanges(range, self.editTextView.selectedRange)) {
+            [self.itemToEdit.rangesForStrike removeObjectAtIndex:i];
+            NSMutableAttributedString *attrStr = [NSMutableAttributedString new];
+            
+            attrStr = (NSMutableAttributedString *)self.editTextView.attributedText;
+            
+            NSDictionary* strikeThroughAttributes = [NSDictionary new];
+            
+            [attrStr removeAttribute:NSStrikethroughStyleAttributeName range:self.editTextView.selectedRange];
+            
+            strikeThroughAttributes = @{NSStrikethroughStyleAttributeName : @0,NSFontAttributeName: [UIFont preferredFontForTextStyle:UIFontTextStyleBody],NSStrikethroughColorAttributeName:[UIColor redColor]};
+            
+            [attrStr setAttributes:strikeThroughAttributes range:self.editTextView.selectedRange];
+            
+            self.editTextView.text = @"";
+            self.editTextView.attributedText = attrStr;
+            
+            return;
+            
+        }
+    }
+    
+    [self.itemToEdit.rangesForStrike addObject:[NSValue valueWithRange:self.editTextView.selectedRange]];
+    
+    NSMutableAttributedString *attrStr = [NSMutableAttributedString new];
+    
+    attrStr = (NSMutableAttributedString *)self.editTextView.attributedText;
+    
+    NSDictionary* strikeThroughAttributes = [NSDictionary new]; //FIGURE OUT HOW TO REMOVE ATTR
+    
+    [attrStr removeAttribute:NSStrikethroughStyleAttributeName range:self.editTextView.selectedRange];
+    
+    strikeThroughAttributes = @{NSStrikethroughStyleAttributeName : @1,NSFontAttributeName: [UIFont preferredFontForTextStyle:UIFontTextStyleBody],NSStrikethroughColorAttributeName:[UIColor redColor]};
+    
+    [attrStr setAttributes:strikeThroughAttributes range:self.editTextView.selectedRange];
+    
+    self.editTextView.text = @"";
+    self.editTextView.attributedText = attrStr;
+    
 }
 
 
